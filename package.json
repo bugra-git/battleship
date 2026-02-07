@@ -1,0 +1,25 @@
+{
+  "name": "battleship",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.29.0",
+    "jest": "^30.2.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bugra-git/battleship.git"
+  },
+  "keywords": [],
+  "author": "bugra",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/bugra-git/battleship/issues"
+  },
+  "homepage": "https://github.com/bugra-git/battleship#readme"
+}
