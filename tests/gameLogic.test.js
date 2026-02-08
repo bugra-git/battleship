@@ -6,9 +6,9 @@ test("ship is vertically placed", () => {
 
   board.placeShip(ship, [4, 3], "vertical");
 
-  expect(board.grid[4][3]).toBe(ship);
-  expect(board.grid[5][3]).toBe(ship);
-  expect(board.grid[6][3]).toBe(ship);
+  expect(board.grid[4][3].ship).toBe(ship);
+  expect(board.grid[5][3].ship).toBe(ship);
+  expect(board.grid[6][3].ship).toBe(ship);
 });
 
 test("ship is horizontally placed", () => {
@@ -17,9 +17,9 @@ test("ship is horizontally placed", () => {
 
   board.placeShip(ship, [4, 3], "horizontal");
 
-  expect(board.grid[4][3]).toBe(ship);
-  expect(board.grid[4][4]).toBe(ship);
-  expect(board.grid[4][5]).toBe(ship);
+  expect(board.grid[4][3].ship).toBe(ship);
+  expect(board.grid[4][4].ship).toBe(ship);
+  expect(board.grid[4][5].ship).toBe(ship);
 });
 
 test("ship cant be placed in occupied squares", () => {
@@ -31,7 +31,7 @@ test("ship cant be placed in occupied squares", () => {
   const secondShip = new Ship(3);
   const result = board.placeShip(secondShip, [3, 2], "horizontal");
 
-  expect(board.grid[3][4]).toBe(firstShip);
+  expect(board.grid[3][4].ship).toBe(firstShip);
   expect(result).toBe(false);
 });
 
@@ -77,4 +77,39 @@ test("ship cant overflow horizontally", () => {
   const result = board.placeShip(ship, [3, 8], "horizontal");
 
   expect(result).toBe(false);
+});
+
+test("gameboard can check if a ship is hit", () => {
+  const board = new Gameboard();
+  const ship = new Ship(3);
+  board.placeShip(ship, [4, 6], "vertical");
+  expect(board.receiveAttack([6, 6])).toBe("hit");
+  expect(board.receiveAttack([7, 6])).toBe("miss");
+});
+
+test("gameboard can run hit function for hitted ship", () => {
+  const board = new Gameboard();
+  const ship = new Ship(3);
+  board.placeShip(ship, [4, 6], "vertical");
+
+  board.receiveAttack([6, 6]);
+  expect(ship.hitCount).toBe(1);
+
+  board.receiveAttack([7, 6]);
+  expect(ship.hitCount).toBe(1);
+
+  board.receiveAttack([5, 6]);
+  expect(ship.hitCount).toBe(2);
+});
+
+test("ship cant be hit in same spot multiple times", () => {
+  const board = new Gameboard();
+  const ship = new Ship(3);
+  board.placeShip(ship, [4, 6], "vertical");
+
+  board.receiveAttack([6, 6]);
+  expect(ship.hitCount).toBe(1);
+
+  expect(board.receiveAttack([6, 6])).toBe(false);
+  expect(ship.hitCount).toBe(1);
 });

@@ -17,7 +17,11 @@ class Gameboard {
   constructor() {
     this.grid = Array(10)
       .fill()
-      .map(() => Array(10).fill(null));
+      .map(() =>
+        Array(10)
+          .fill()
+          .map(() => ({ ship: null, attacked: false })),
+      );
   }
 
   placeShip(ship, [row, col], alignment) {
@@ -36,7 +40,7 @@ class Gameboard {
           const nr = r + dr;
           const nc = c + dc;
 
-          if (this.grid[nr][nc]) return false;
+          if (this.grid[nr][nc].ship) return false;
         }
       }
 
@@ -44,10 +48,24 @@ class Gameboard {
     }
 
     for (const [r, c] of coords) {
-      this.grid[r][c] = ship;
+      this.grid[r][c].ship = ship;
     }
 
     return true;
+  }
+
+  receiveAttack([row, col]) {
+    const cell = this.grid[row][col];
+
+    if (cell.attacked) return false;
+    cell.attacked = true;
+
+    if (cell.ship) {
+      cell.ship.hit();
+      return "hit";
+    }
+
+    return "miss";
   }
 }
 
