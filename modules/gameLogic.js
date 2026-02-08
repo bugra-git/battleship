@@ -22,6 +22,8 @@ class Gameboard {
           .fill()
           .map(() => ({ ship: null, attacked: false })),
       );
+
+    this.ships = [];
   }
 
   placeShip(ship, [row, col], alignment) {
@@ -51,6 +53,8 @@ class Gameboard {
       this.grid[r][c].ship = ship;
     }
 
+    this.ships.push(ship);
+
     return true;
   }
 
@@ -66,6 +70,10 @@ class Gameboard {
     }
 
     return "miss";
+  }
+
+  allShipsSunk() {
+    return this.ships.every((ship) => ship.isSunk());
   }
 }
 

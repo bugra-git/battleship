@@ -113,3 +113,30 @@ test("ship cant be hit in same spot multiple times", () => {
   expect(board.receiveAttack([6, 6])).toBe(false);
   expect(ship.hitCount).toBe(1);
 });
+
+test("gameboard can tell when all ships are sunk", () => {
+  const board = new Gameboard();
+
+  const ship1 = new Ship(3);
+  board.placeShip(ship1, [4, 6], "vertical");
+
+  const ship2 = new Ship(4);
+  board.placeShip(ship2, [3, 1], "horizontal");
+
+  board.receiveAttack([4, 6]);
+  board.receiveAttack([4, 7]);
+  board.receiveAttack([5, 6]);
+
+  board.receiveAttack([6, 6]);
+  expect(ship1.isSunk()).toBe(true);
+  expect(board.allShipsSunk()).toBe(false);
+
+  board.receiveAttack([3, 2]);
+  board.receiveAttack([3, 1]);
+  board.receiveAttack([3, 0]);
+  board.receiveAttack([3, 3]);
+
+  board.receiveAttack([3, 4]);
+  expect(ship2.isSunk()).toBe(true);
+  expect(board.allShipsSunk()).toBe(true);
+});
