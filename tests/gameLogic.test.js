@@ -1,4 +1,4 @@
-import { Ship, Gameboard, Player } from "../modules/gameLogic";
+import { Ship, Gameboard, Player } from "../src/modules/gameLogic";
 
 test("ship is vertically placed", () => {
   const ship = new Ship(3);
