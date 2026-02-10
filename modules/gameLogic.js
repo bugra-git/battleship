@@ -77,4 +77,15 @@ class Gameboard {
   }
 }
 
-export { Ship, Gameboard };
+class Player {
+  constructor(type = "human") {
+    this.board = new Gameboard();
+    this.type = type;
+  }
+
+  attack(opponentsBoard, [row, col]) {
+    opponentsBoard.receiveAttack([row, col]);
+  }
+}
+
+export { Ship, Gameboard, Player };

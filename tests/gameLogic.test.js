@@ -1,4 +1,4 @@
-import { Ship, Gameboard } from "../modules/gameLogic";
+import { Ship, Gameboard, Player } from "../modules/gameLogic";
 
 test("ship is vertically placed", () => {
   const ship = new Ship(3);
@@ -139,4 +139,22 @@ test("gameboard can tell when all ships are sunk", () => {
   board.receiveAttack([3, 4]);
   expect(ship2.isSunk()).toBe(true);
   expect(board.allShipsSunk()).toBe(true);
+});
+
+test("players can attack opponents board", () => {
+  const player1 = new Player();
+  const ship1 = new Ship(3);
+  player1.board.placeShip(ship1, [4, 6], "vertical");
+
+  const player2 = new Player();
+  const ship2 = new Ship(2);
+  player2.board.placeShip(ship2, [7, 3], "horizontal");
+
+  player1.attack(player2.board, [7, 4]);
+  player2.attack(player1.board, [4, 6]);
+  player1.attack(player2.board, [7, 3]);
+
+  expect(ship1.hitCount).toBe(1);
+  expect(ship2.isSunk()).toBe(true);
+  expect(player2.board.allShipsSunk()).toBe(true);
 });
