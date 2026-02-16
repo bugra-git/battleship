@@ -42,6 +42,7 @@ class Gameboard {
           const nr = r + dr;
           const nc = c + dc;
 
+          if (nr < 0 || nr >= 10 || nc < 0 || nc >= 10) continue;
           if (this.grid[nr][nc].ship) return false;
         }
       }
@@ -59,6 +60,16 @@ class Gameboard {
   }
 
   receiveAttack([row, col]) {
+    if (
+      row === undefined ||
+      col === undefined ||
+      row < 0 ||
+      row >= 10 ||
+      col < 0 ||
+      col >= 10
+    )
+      return false;
+
     const cell = this.grid[row][col];
 
     if (cell.attacked) return false;
@@ -84,7 +95,7 @@ class Player {
   }
 
   attack(opponentsBoard, [row, col]) {
-    opponentsBoard.receiveAttack([row, col]);
+    return opponentsBoard.receiveAttack([row, col]);
   }
 }
 
