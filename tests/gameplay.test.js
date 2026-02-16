@@ -10,3 +10,9 @@ test("human ships can be placed on board", () => {
   expect(game.human.board.grid[4][4].ship).toBe(game.human.board.ships[3]);
   expect(game.human.board.grid[8][2].ship).toBe(game.human.board.ships[4]);
 });
+
+test("computer ships can be placed on board randomly", () => {
+  const game = new Game();
+  game.placeComShips();
+  expect(game.comp.board.ships.length).toBe(5);
+})

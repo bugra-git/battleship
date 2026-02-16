@@ -25,6 +25,24 @@ class Game {
       this.human.board.placeShip(s.ship, s.coords, s.alignment);
     });
   }
+
+  placeComShips() {
+    const getRandomInt = (max) => Math.floor(Math.random() * max);
+
+    const placeRandomShip = (length) => {
+      let placed = false;
+
+      while (!placed) {
+        placed = this.comp.board.placeShip(
+          new Ship(length),
+          [getRandomInt(10), getRandomInt(10)],
+          getRandomInt(2) ? "vertical" : "horizontal",
+        );
+      }
+    };
+
+    this.shipSizes.forEach(placeRandomShip);
+  }
 }
 
 export { Game };
