@@ -5,22 +5,28 @@ class Game {
     this.human = new Player();
     this.comp = new Player("computer");
     this.shipSizes = [5, 4, 3, 3, 2];
-    this.humanShips = this.shipSizes.map((length) => ({
-      ship: new Ship(length),
-    }));
-    this.humanShips[0].coords = [0, 0];
-    this.humanShips[0].alignment = "vertical";
-    this.humanShips[1].coords = [7, 6];
-    this.humanShips[1].alignment = "horizontal";
-    this.humanShips[2].coords = [0, 5];
-    this.humanShips[2].alignment = "horizontal";
-    this.humanShips[3].coords = [4, 4];
-    this.humanShips[3].alignment = "vertical";
-    this.humanShips[4].coords = [8, 2];
-    this.humanShips[4].alignment = "horizontal";
+
+    this.humanShips = [
+      { title: "Carrier", ship: new Ship(5) },
+      { title: "Battleship", ship: new Ship(4) },
+      { title: "Cruiser", ship: new Ship(3) },
+      { title: "Submarine", ship: new Ship(3) },
+      { title: "Destroyer", ship: new Ship(2) },
+    ];
+
+    this.placeComShips();
+  }
+
+  positionShip(title, [row, col], alignment) {
+    const ship = this.humanShips.find((s) => s.title === title);
+    if (ship) {
+      ship.coords = [row, col];
+      ship.alignment = alignment;
+    }
   }
 
   initHumanShips() {
+    if (this.humanShips.some((s) => !s.coords || !s.alignment)) return;
     this.humanShips.forEach((s) => {
       this.human.board.placeShip(s.ship, s.coords, s.alignment);
     });
