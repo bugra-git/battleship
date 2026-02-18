@@ -14,6 +14,15 @@ class Game {
       { title: "Destroyer", ship: new Ship(2) },
     ];
 
+    this.compState = {
+      targetShip: null,
+      base: null,
+      start: null,
+      queue: [],
+      direction: null,
+      reversed: false,
+    };
+
     this.placeComShips();
   }
 
@@ -68,15 +77,17 @@ class Game {
     if (this.comp.board.allShipsSunk()) {
       result.winner = "player";
     } else {
-      const [[comAttackRow, comAttackCol], compAttackResult] = this.compAttack(
-        row,
-        col,
-      );
+      const {
+        coord: [comAttackRow, comAttackCol],
+        result: compAttackResult,
+      } = this.compAttack();
+
       result.compAttack = {
         row: comAttackRow,
         col: comAttackCol,
         compResult: compAttackResult,
       };
+
       if (
         this.human.board.grid[comAttackRow][comAttackCol].ship &&
         this.human.board.grid[comAttackRow][comAttackCol].ship.isSunk()
@@ -97,9 +108,104 @@ class Game {
       return true;
   }
 
-  compAttack(row, col) {
-    const attackResult = this.comp.attack(this.human.board, [row, col]);
-    return [[row, col], attackResult];
+  compAttack() {
+    const getRandomInt = (max) => Math.floor(Math.random() * max);
+    const s = this.compState;
+    const resetState = () => {
+      s.targetShip = null;
+      s.base = null;
+      s.queue = [];
+      s.direction = null;
+      s.start = null;
+      s.reversed = false;
+    };
+
+    const coordIsValid = (coord) => {
+      const [r, c] = coord;
+      return (
+        r >= 0 &&
+        r < 10 &&
+        c >= 0 &&
+        c < 10 &&
+        !this.human.board.grid[r][c].attacked
+      );
+    };
+
+    let coord, result;
+
+    if (!s.targetShip) {
+      while (true) {
+        coord = [getRandomInt(10), getRandomInt(10)];
+        if (coordIsValid(coord)) break;
+      }
+
+      result = this.comp.attack(this.human.board, coord);
+
+      if (result === "hit") {
+        s.targetShip = this.human.board.grid[coord[0]][coord[1]].ship;
+        s.base = coord;
+        s.start = coord;
+        s.queue = [
+          [coord[0] - 1, coord[1]],
+          [coord[0] + 1, coord[1]],
+          [coord[0], coord[1] - 1],
+          [coord[0], coord[1] + 1],
+        ];
+      }
+    } else if (s.targetShip.hitCount === 1) {
+      while (s.queue.length) {
+        coord = s.queue.pop();
+        if (coordIsValid(coord)) break;
+        coord = null;
+      }
+
+      if (coord) {
+        result = this.comp.attack(this.human.board, coord);
+      } else {
+        resetState();
+        return this.compAttack();
+      }
+
+      if (result === "hit") {
+        const [r, c] = coord;
+        s.direction = [coord[0] - s.base[0], coord[1] - s.base[1]];
+        s.base = coord;
+        if (s.targetShip.isSunk()) {
+          resetState();
+        }
+      }
+    } else {
+      while (true) {
+        coord = [s.base[0] + s.direction[0], s.base[1] + s.direction[1]];
+        if (coordIsValid(coord) || s.reversed) break;
+        s.direction = [-s.direction[0], -s.direction[1]];
+        s.base = s.start;
+        s.reversed = true;
+      }
+
+      if (!coordIsValid(coord)) {
+        resetState();
+        return this.compAttack();
+      }
+
+      result = this.comp.attack(this.human.board, coord);
+
+      if (result === "hit") {
+        if (s.targetShip.isSunk()) {
+          resetState();
+        } else {
+          s.base = coord;
+        }
+      } else if (!s.reversed) {
+        s.direction = [-s.direction[0], -s.direction[1]];
+        s.base = s.start;
+        s.reversed = true;
+      } else {
+        resetState();
+      }
+    }
+
+    return { coord, result };
   }
 }
 
