@@ -1,0 +1,68 @@
+body {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  gap: 1rem;
+  max-width: 1200px;
+  margin-inline: auto;
+}
+
+.game {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  justify-items: center;
+  gap: 1rem;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(11, 48px);
+  grid-template-rows: repeat(11, 48px);
+}
+
+.cell {
+  border: 1px solid black;
+}
+
+.label {
+  align-self: center;
+}
+
+.hasShip {
+  background-color: aquamarine;
+}
+
+.cell {
+  position: relative;
+}
+
+.cell.miss::after {
+  content: "";
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: black;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.cell.hit::before,
+.cell.hit::after {
+  content: "";
+  position: absolute;
+  width: 70%;
+  height: 3px;
+  background: red;
+  top: 50%;
+  left: 50%;
+}
+
+.cell.hit::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.cell.hit::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
