@@ -3,21 +3,8 @@ import { Game } from "./gameplay.js";
 class UI {
   constructor() {
     this.cellSize = 48;
-    this.game = null;
-
-    this.shipConfig = [
-      { title: "Carrier", length: 5, coord: [0, 0], alignment: "vertical" },
-      {
-        title: "Battleship",
-        length: 4,
-        coord: [7, 6],
-        alignment: "horizontal",
-      },
-      { title: "Cruiser", length: 3, coord: [0, 5], alignment: "horizontal" },
-      { title: "Submarine", length: 3, coord: [4, 4], alignment: "vertical" },
-      { title: "Destroyer", length: 2, coord: [8, 2], alignment: "horizontal" },
-    ];
-
+    this.game = new Game();
+    this.gameStarted = false;
     this.cacheDOM();
     this.generateGrid();
     this.initShipRender();
@@ -59,11 +46,11 @@ class UI {
   }
 
   renderShip(ship) {
-    for (let i = 0; i < ship.length; i++) {
+    for (let i = 0; i < ship.ship.length; i++) {
       const r =
-        ship.alignment === "vertical" ? ship.coord[0] + i : ship.coord[0];
+        ship.alignment === "vertical" ? ship.coords[0] + i : ship.coords[0];
       const c =
-        ship.alignment === "horizontal" ? ship.coord[1] + i : ship.coord[1];
+        ship.alignment === "horizontal" ? ship.coords[1] + i : ship.coords[1];
 
       const cell = document.querySelector(`[data-row="${r}"][data-col="${c}"]`);
 
@@ -75,7 +62,7 @@ class UI {
   }
 
   initShipRender() {
-    this.shipConfig.forEach((s) => this.renderShip(s));
+     this.game.humanShips.forEach((s) => this.renderShip(s));
   }
 
   bindEvents() {
@@ -89,18 +76,14 @@ class UI {
 
     this.compBoard.addEventListener("click", (e) => {
       const cell = e.target.closest(".cell");
-      if (!cell || !this.game) return;
+      if (!cell || !this.gameStarted) return;
 
       this.handlePlayerMove(cell);
     });
   }
 
   startGame() {
-    this.game = new Game();
-    this.shipConfig.forEach((s) =>
-      this.game.positionShip(s.title, s.coord, s.alignment),
-    );
-    this.game.initHumanShips();
+    this.gameStarted = true;
     this.playerHeader.textContent = "Your board";
     this.compHeader.textContent = "Opponent's board";
     this.buttons.innerHTML = `<button id="reset">Reset</button>`;
@@ -146,8 +129,8 @@ class UI {
   }
 
   resetGame() {
-    this.game = null;
-    this.playerHeader.textContent = "Place your ships";
+    this.game = new Game();
+    this.playerHeader.textContent = "Drag and drop to move, click to rotate";
     this.compHeader.textContent = "Opponent's board";
     this.buttons.innerHTML = `<button id="play">Play</button>`;
 

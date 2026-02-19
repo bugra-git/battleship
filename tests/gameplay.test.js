@@ -1,33 +1,19 @@
 import { Game } from "../src/modules/gameplay.js";
 
-function setupGame() {
+test("human ships can be placed on board randomly when game is", () => {
   const game = new Game();
-  game.positionShip("Carrier", [0, 0], "vertical");
-  game.positionShip("Battleship", [7, 6], "horizontal");
-  game.positionShip("Cruiser", [0, 5], "horizontal");
-  game.positionShip("Submarine", [4, 4], "vertical");
-  game.positionShip("Destroyer", [8, 2], "horizontal");
-  game.initHumanShips();
-  return game;
-}
-
-test("human ships can be placed on board", () => {
-  const game = setupGame();
   expect(game.human.board.ships.length).toBe(5);
-  expect(game.human.board.grid[0][0].ship).toBe(game.human.board.ships[0]);
-  expect(game.human.board.grid[7][6].ship).toBe(game.human.board.ships[1]);
-  expect(game.human.board.grid[0][5].ship).toBe(game.human.board.ships[2]);
-  expect(game.human.board.grid[4][4].ship).toBe(game.human.board.ships[3]);
-  expect(game.human.board.grid[8][2].ship).toBe(game.human.board.ships[4]);
+  expect(game.humanShips.some(s => s.coords === undefined)).toBe(false);
+  expect(game.humanShips.some(s => s.alignment === undefined)).toBe(false);
 });
 
 test("computer ships can be placed on board randomly", () => {
-  const game = setupGame();
+  const game = new Game();
   expect(game.comp.board.ships.length).toBe(5);
 });
 
 test("round cant be played when game is over", () => {
-  const game = setupGame();
+  const game = new Game();
 
   // Simulate sinking all human ships
   for (const s of game.humanShips) {
@@ -44,7 +30,7 @@ test("round cant be played when game is over", () => {
 });
 
 test("round cant be played with invalid coordinates", () => {
-  const game = setupGame();
+  const game = new Game();
 
   const attackResult1 = game.playRound([-1, 0]);
   const attackResult2 = game.playRound([0, -1]);
@@ -58,7 +44,7 @@ test("round cant be played with invalid coordinates", () => {
 });
 
 test("round cant be played on already attacked cell", () => {
-  const game = setupGame();
+  const game = new Game();
 
   const attackResult1 = game.playRound([0, 0]);
   const attackResult2 = game.playRound([0, 0]);
@@ -68,14 +54,14 @@ test("round cant be played on already attacked cell", () => {
 });
 
 test("player can attack computer board", () => {
-  const game = setupGame();
+  const game = new Game();
 
   const attackResult = game.playRound([0, 0]);
   expect(["hit", "miss"]).toContain(attackResult.attack);
 });
 
 test("game can detect when all computer ships are sunk, return winner property and wont allow computer to make any more moves", () => {
-  const game = setupGame();
+  const game = new Game();
 
   let result;
   // Simulate sinking all computer ships
@@ -94,7 +80,7 @@ test("game can detect when all computer ships are sunk, return winner property a
 });
 
 test("game can detect when all human ships are sunk and return winner property", () => {
-  const game = setupGame();
+  const game = new Game();
 
   const getRandomInt = (max) => Math.floor(Math.random() * max);
   let result;
@@ -112,7 +98,7 @@ test("game can detect when all human ships are sunk and return winner property",
 });
 
 test("if human ship is sunk, result should have sunk property", () => {
-  const game = setupGame();
+  const game = new Game();
 
   const getRandomInt = (max) => Math.floor(Math.random() * max);
 
@@ -128,7 +114,7 @@ test("if human ship is sunk, result should have sunk property", () => {
 });
 
 test("if computer ship is sunk, result should have sunk property", () => {
-  const game = setupGame();
+  const game = new Game();
 
   let result;
   // Simulate sinking the first computer ship
@@ -146,48 +132,8 @@ test("if computer ship is sunk, result should have sunk property", () => {
   expect(result.sunk).toBe(true);
 });
 
-test("human ships can be positioned with positionShip method", () => {
-  const game = new Game();
-  game.positionShip("Carrier", [0, 0], "vertical");
-  game.positionShip("Battleship", [7, 6], "horizontal");
-  game.positionShip("Cruiser", [0, 5], "horizontal");
-  game.positionShip("Submarine", [4, 4], "vertical");
-  game.positionShip("Destroyer", [8, 2], "horizontal");
-
-  expect(game.humanShips[0].coords).toEqual([0, 0]);
-  expect(game.humanShips[0].alignment).toBe("vertical");
-  expect(game.humanShips[1].coords).toEqual([7, 6]);
-  expect(game.humanShips[1].alignment).toBe("horizontal");
-  expect(game.humanShips[2].coords).toEqual([0, 5]);
-  expect(game.humanShips[2].alignment).toBe("horizontal");
-  expect(game.humanShips[3].coords).toEqual([4, 4]);
-  expect(game.humanShips[3].alignment).toBe("vertical");
-  expect(game.humanShips[4].coords).toEqual([8, 2]);
-  expect(game.humanShips[4].alignment).toBe("horizontal");
-});
-
-test("ships arent initiated if any human ship is missing coords or alignment", () => {
-  const game = new Game();
-  game.humanShips[0].coords = null; // Missing coords for first ship
-  game.initHumanShips();
-
-  expect(game.human.board.ships.length).toBe(0); // No ships should be placed
-});
-
-test("ships are initiated if all human ships have coords and alignment", () => {
-  const game = new Game();
-  game.positionShip("Carrier", [0, 0], "vertical");
-  game.positionShip("Battleship", [7, 6], "horizontal");
-  game.positionShip("Cruiser", [0, 5], "horizontal");
-  game.positionShip("Submarine", [4, 4], "vertical");
-  game.positionShip("Destroyer", [8, 2], "horizontal");
-  game.initHumanShips();
-
-  expect(game.human.board.ships.length).toBe(5); // All ships should be placed
-});
-
 test("computer can choose a coordinate to attack", () => {
-  const game = setupGame();
+  const game = new Game();
 
   const attackResult = game.compAttack();
   expect(attackResult).toHaveProperty("coord");
@@ -197,7 +143,7 @@ test("computer can choose a coordinate to attack", () => {
 });
 
 test("coord cannot be out of bounds", () => {
-  const game = setupGame();
+  const game = new Game();
 
   for (let i = 0; i < 100; i++) {
     const attackResult = game.compAttack();
@@ -210,7 +156,7 @@ test("coord cannot be out of bounds", () => {
 });
 
 test("coord cannot be a previously attacked cell", () => {
-  const game = setupGame();
+  const game = new Game();
   const attackedCoords = new Set();
 
   for (let i = 0; i < 100; i++) {
@@ -224,7 +170,7 @@ test("coord cannot be a previously attacked cell", () => {
 });
 
 test("it founds valid coordinate and attacks the cell on human board", () => {
-  const game = setupGame();
+  const game = new Game();
   for (let i = 0; i < 100; i++) {
     const attackResult = game.compAttack();
     const [row, col] = attackResult.coord;
@@ -234,7 +180,7 @@ test("it founds valid coordinate and attacks the cell on human board", () => {
 });
 
 test("computer attack returns the result of the attack and the coordinate used", () => {
-  const game = setupGame();
+  const game = new Game();
   for (let i = 0; i < 100; i++) {
     const attackResult = game.compAttack();
     expect(attackResult).toHaveProperty("coord");
@@ -244,7 +190,7 @@ test("computer attack returns the result of the attack and the coordinate used",
 });
 
 test("if a new ship is hit computer will target that ship, set base for next attack, and adjacent cells are added to queue", () => {
-  const game = setupGame();
+  const game = new Game();
 
   // Simulate a hit on a ship
   let attackResult;
@@ -265,7 +211,7 @@ test("if a new ship is hit computer will target that ship, set base for next att
 });
 
 test("if a ship is targeted and hit once next attacks will be on adjacent cell until direction is established", () => {
-  const game = setupGame();
+  const game = new Game();
 
   // Simulate a hit on a ship
   let attackResult;
@@ -301,7 +247,7 @@ test("if a ship is targeted and hit once next attacks will be on adjacent cell u
 });
 
 test("if second attack on targeted ship sinks the ship computer will reset state", () => {
-  const game = setupGame();
+  const game = new Game();
 
   // Simulate a hit on a destroyer (length 2)
   let attackResult;
@@ -329,7 +275,7 @@ test("if second attack on targeted ship sinks the ship computer will reset state
 });
 
 test("if a ship longer than 2 is targeted and hit more than once computer can choose a valid coordinate in the same direction and attack", () => {
-  const game = setupGame();
+  const game = new Game();
 
   // Simulate a hit on a ship longer than 2
   let attackResult;
@@ -351,7 +297,7 @@ test("if a ship longer than 2 is targeted and hit more than once computer can ch
 });
 
 test("if a ship longer than 2 is targeted it will be attacked until it sinks and then computer will reset state", () => {
-  const game = setupGame();
+  const game = new Game();
 
   // Simulate a hit on a ship longer than 2
   let attackResult;
@@ -381,7 +327,7 @@ test("if a ship longer than 2 is targeted it will be attacked until it sinks and
 
 test("computer can successfully sink all human ships using its attack strategy", () => {
   for (let i = 0; i < 10; i++) {
-    const game = setupGame();
+    const game = new Game();
 
     while (!game.gameOver()) {
       game.compAttack();
@@ -398,7 +344,7 @@ test("computer can successfully sink all human ships using its attack strategy",
 
 test("game can be played to end with calling playRound repeatedly with random valid coordinates", () => {
   for (let i = 0; i < 100; i++) {
-    const game = setupGame();
+    const game = new Game();
     const getRandomInt = (max) => Math.floor(Math.random() * max);
 
     while (!game.gameOver()) {

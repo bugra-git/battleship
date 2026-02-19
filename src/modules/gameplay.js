@@ -23,35 +23,55 @@ class Game {
       reversed: false,
     };
 
-    this.placeComShips();
+    this.initComShips();
+    this.initHumanShips();
   }
 
   positionShip(title, [row, col], alignment) {
-    const ship = this.humanShips.find((s) => s.title === title);
-    if (ship) {
-      ship.coords = [row, col];
-      ship.alignment = alignment;
-    }
+    const shipObj = this.humanShips.find((s) => s.title === title);
+    if (!shipObj) return false;
+
+    const placed = this.human.board.placeShip(
+      shipObj.ship,
+      [row, col],
+      alignment,
+    );
+
+    if (!placed) return false;
+
+    shipObj.coords = [row, col];
+    shipObj.alignment = alignment;
+
+    return true;
+  }
+
+  getRandomInt(max) {
+    return Math.floor(Math.random() * max);
   }
 
   initHumanShips() {
-    if (this.humanShips.some((s) => !s.coords || !s.alignment)) return;
-    this.humanShips.forEach((s) => {
-      this.human.board.placeShip(s.ship, s.coords, s.alignment);
-    });
+    const placeRandomShip = (ship) => {
+      let placed = false;
+
+      while (!placed) {
+        const coord = [this.getRandomInt(10), this.getRandomInt(10)];
+        const alignment = this.getRandomInt(2) ? "vertical" : "horizontal";
+        placed = this.positionShip(ship.title, coord, alignment);
+      }
+    };
+
+    this.humanShips.forEach(placeRandomShip);
   }
 
-  placeComShips() {
-    const getRandomInt = (max) => Math.floor(Math.random() * max);
-
+  initComShips() {
     const placeRandomShip = (length) => {
       let placed = false;
 
       while (!placed) {
         placed = this.comp.board.placeShip(
           new Ship(length),
-          [getRandomInt(10), getRandomInt(10)],
-          getRandomInt(2) ? "vertical" : "horizontal",
+          [this.getRandomInt(10), this.getRandomInt(10)],
+          this.getRandomInt(2) ? "vertical" : "horizontal",
         );
       }
     };
