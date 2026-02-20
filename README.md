@@ -7,6 +7,8 @@ This project focuses on clean architecture, game logic design, and
 implementing custom drag-and-drop ship placement without external
 libraries.
 
+https://bugra-git.github.io/battleship/
+
 ------------------------------------------------------------------------
 
 ## ✨ Features
