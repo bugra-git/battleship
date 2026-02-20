@@ -56,13 +56,13 @@ class UI {
 
       if (cell) {
         cell.classList.add("hasShip");
-        cell.classList.add(ship.title.toLowerCase());
+        cell.dataset.ship = ship.title;
       }
     }
   }
 
   initShipRender() {
-     this.game.humanShips.forEach((s) => this.renderShip(s));
+    this.game.humanShips.forEach((s) => this.renderShip(s));
   }
 
   bindEvents() {
@@ -79,6 +79,10 @@ class UI {
       if (!cell || !this.gameStarted) return;
 
       this.handlePlayerMove(cell);
+    });
+
+    this.playerBoard.addEventListener("click", (e) => {
+      this.rotateShip(e.target);
     });
   }
 
@@ -129,6 +133,7 @@ class UI {
   }
 
   resetGame() {
+    this.gameStarted = false;
     this.game = new Game();
     this.playerHeader.textContent = "Drag and drop to move, click to rotate";
     this.compHeader.textContent = "Opponent's board";
@@ -141,6 +146,38 @@ class UI {
     });
 
     this.initShipRender();
+  }
+
+  rotateShip(target) {
+    if (this.gameStarted) return;
+
+    const cell = target.closest(".hasShip");
+    if (!cell) return;
+
+    const shipTitle = cell.dataset.ship;
+
+    const shipObj = this.game.humanShips.find((s) => s.title === shipTitle);
+
+    const newAlignment =
+      shipObj.alignment === "vertical" ? "horizontal" : "vertical";
+
+    const success = this.game.positionShip(
+      shipObj.title,
+      shipObj.coords,
+      newAlignment,
+    );
+
+    if (success) {
+      const formerCells = document.querySelectorAll(
+        `.player-board [data-ship="${shipObj.title}"]`,
+      );
+      formerCells.forEach((c) => {
+        c.classList.remove("hasShip");
+        delete c.dataset.ship;
+      });
+
+      this.renderShip(shipObj);
+    }
   }
 }
 
