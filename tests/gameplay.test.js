@@ -3,8 +3,8 @@ import { Game } from "../src/modules/gameplay.js";
 test("human ships can be placed on board randomly when game is", () => {
   const game = new Game();
   expect(game.human.board.ships.length).toBe(5);
-  expect(game.humanShips.some(s => s.coords === undefined)).toBe(false);
-  expect(game.humanShips.some(s => s.alignment === undefined)).toBe(false);
+  expect(game.humanShips.some((s) => s.coords === undefined)).toBe(false);
+  expect(game.humanShips.some((s) => s.alignment === undefined)).toBe(false);
 });
 
 test("computer ships can be placed on board randomly", () => {
@@ -352,5 +352,59 @@ test("game can be played to end with calling playRound repeatedly with random va
     }
 
     expect(game.gameOver()).toBe(true);
+  }
+});
+
+test("if a ship is being repositioned it will be removed from the board and rendered in new position", () => {
+  while (true) {
+    const game = new Game();
+    const humanGrid = game.human.board.grid;
+    if (
+      humanGrid[0][0].ship ||
+      humanGrid[1][0].ship ||
+      humanGrid[2][0].ship ||
+      humanGrid[3][0].ship ||
+      humanGrid[4][0].ship ||
+      humanGrid[5][0].ship ||
+      humanGrid[0][1].ship ||
+      humanGrid[1][1].ship ||
+      humanGrid[2][1].ship ||
+      humanGrid[3][1].ship ||
+      humanGrid[4][1].ship ||
+      humanGrid[5][1].ship
+    )
+      continue;
+
+    const ship = game.humanShips[0];
+    const originalCoord = ship.coords;
+
+    game.positionShip(ship.title, [0, 0], "vertical");
+
+    expect(game.human.board.grid[0][0].ship).toBe(ship.ship);
+    expect(game.human.board.grid[1][0].ship).toBe(ship.ship);
+    expect(game.human.board.grid[originalCoord[0]][originalCoord[1]].ship).toBe(
+      null,
+    );
+
+    break;
+  }
+});
+
+test("if a ship is being repositioned and new position is invalid it will be rendered back in original position", () => {
+  while (true) {
+    const game = new Game();
+    const humanGrid = game.human.board.grid;
+    if (!humanGrid[0][0].ship) continue;
+
+    const ship = game.humanShips[0];
+    const originalCoord = ship.coords;
+
+    game.positionShip(ship.title, [0, 0], "horizontal");
+
+    expect(game.human.board.grid[originalCoord[0]][originalCoord[1]].ship).toBe(
+      ship.ship,
+    );
+
+    break;
   }
 });

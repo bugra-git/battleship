@@ -158,3 +158,57 @@ test("players can attack opponents board", () => {
   expect(ship2.isSunk()).toBe(true);
   expect(player2.board.allShipsSunk()).toBe(true);
 });
+
+test("ship can be removed from board", () => {
+  const board = new Gameboard();
+  const ship = new Ship(3);
+  board.placeShip(ship, [4, 6], "vertical");
+
+  board.removeShip(ship);
+
+  expect(board.grid[4][6].ship).toBe(null);
+  expect(board.grid[5][6].ship).toBe(null);
+  expect(board.grid[6][6].ship).toBe(null);
+  expect(board.ships.includes(ship)).toBe(false);
+});
+
+test("ship can be placed after being removed", () => {
+  const board = new Gameboard();
+  const ship = new Ship(3);
+  board.placeShip(ship, [4, 6], "vertical");
+
+  board.removeShip(ship);
+
+  const result = board.placeShip(ship, [2, 2], "horizontal");
+
+  expect(result).toBe(true);
+  expect(board.grid[2][2].ship).toBe(ship);
+  expect(board.grid[2][3].ship).toBe(ship);
+  expect(board.grid[2][4].ship).toBe(ship);
+  expect(board.ships.includes(ship)).toBe(true);
+});
+
+test("ship can be hit after being removed and placed again in different position", () => {
+  const board = new Gameboard();
+  const ship = new Ship(3);
+  board.placeShip(ship, [4, 6], "vertical");
+
+  board.removeShip(ship);
+
+  board.placeShip(ship, [2, 2], "horizontal");
+
+  board.receiveAttack([4, 6]);
+  expect(ship.hitCount).toBe(0);
+
+  board.receiveAttack([2, 3]);
+  expect(ship.hitCount).toBe(1);
+
+  board.receiveAttack([4, 7]);
+  expect(ship.hitCount).toBe(1);
+
+  board.receiveAttack([2, 4]);
+  expect(ship.hitCount).toBe(2);
+
+  board.receiveAttack([2, 2]);
+  expect(ship.hitCount).toBe(3);
+});

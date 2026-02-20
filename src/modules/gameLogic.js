@@ -59,6 +59,18 @@ class Gameboard {
     return true;
   }
 
+  removeShip(ship) {
+    this.grid.forEach((row) =>
+      row.forEach((cell) => {
+        if (cell.ship === ship) {
+          cell.ship = null;
+        }
+      }),
+    );
+
+    this.ships = this.ships.filter((s) => s !== ship);
+  }
+
   receiveAttack([row, col]) {
     if (
       row === undefined ||

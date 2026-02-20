@@ -31,13 +31,20 @@ class Game {
     const shipObj = this.humanShips.find((s) => s.title === title);
     if (!shipObj) return false;
 
-    const placed = this.human.board.placeShip(
-      shipObj.ship,
-      [row, col],
-      alignment,
-    );
+    const board = this.human.board;
 
-    if (!placed) return false;
+    if (shipObj.coords && shipObj.alignment) {
+      board.removeShip(shipObj.ship);
+    }
+
+    const placed = board.placeShip(shipObj.ship, [row, col], alignment);
+
+    if (!placed) {
+      if (shipObj.coords && shipObj.alignment) {
+        board.placeShip(shipObj.ship, shipObj.coords, shipObj.alignment);
+      }
+      return false;
+    }
 
     shipObj.coords = [row, col];
     shipObj.alignment = alignment;
