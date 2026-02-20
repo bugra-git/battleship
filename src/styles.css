@@ -66,3 +66,8 @@ body {
 .cell.hit::after {
   transform: translate(-50%, -50%) rotate(-45deg);
 }
+
+.preview {
+  background-color: aquamarine;
+  opacity: 0.5;
+}
